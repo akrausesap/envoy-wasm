@@ -1,0 +1,24 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  envoy:
+    image: istio/proxyv2:1.8.1
+    entrypoint: "/usr/local/bin/envoy"
+    command: 
+      - "-c" 
+      - "/tmp/envoy/envoy.yaml" 
+      - "--concurrency" 
+      - "2" 
+      - "--log-format-prefix-with-location"
+      - '0' 
+      - "--log-format"
+      - '%v' # --log-format-prefix-with-location will be removed at 1.17.0 release"
+    ports:
+      - "18000:18000"
+      - "8099:8099"
+    volumes:
+      - ".:/tmp/envoy"
+    working_dir: "/tmp/envoy"
+    depends_on: 
+     - httpbin
+  httpbin:
+    image: kennethreitz/httpbin

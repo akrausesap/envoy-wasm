@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: my-filter-httpbin
+spec:
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          filterChain:
+            filter:
+              name: envoy.http_connection_manager
+              subFilter:
+                name: envoy.router
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: my-filter-httpbin
+          typed_config:
+            "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+            type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+            value:
+              config:
+                # 'configuration' available at root_context.getConfiguration()
+                configuration:
+                  "@type": type.googleapis.com/google.protobuf.StringValue
+                  value: my-filter
+                # root_id MUST match registerRootContext() 2nd param
+                root_id: my-filter
+                vm_config:
+                  code:
+                    local:
+                      filename: /var/local/lib/wasm-filters/my-filter.wasm
+                  runtime: envoy.wasm.runtime.v8
+                  vm_id: my-filter
+  workloadSelector:
+    labels:
+      filter: my-filter
