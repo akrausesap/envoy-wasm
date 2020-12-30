@@ -25,7 +25,7 @@ spec:
                 # 'configuration' available at root_context.getConfiguration()
                 configuration:
                   "@type": type.googleapis.com/google.protobuf.StringValue
-                  value: my-filter
+                  value: "Hello: Andreas"
                 # root_id MUST match registerRootContext() 2nd param
                 root_id: my-filter
                 vm_config:
